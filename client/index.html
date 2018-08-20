@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <h1>Add Item</h1>
+        Name :
+        <input v-model="name" type="text" class="login-input" placeholder="name">
+        <br>
+        Price :
+        <input v-model="price" type="text" class="login-input" placeholder="price">
+        <br>
+        Stock
+        <input v-model="stock" type="text" class="login-input" placeholder="stock">
+        <br>
+        <!-- <input v-model="tags" type="text" class="login-input" placeholder="tags">
+        <br> -->
+        Tags : 
+        <div v-for="tag in tags">
+            <input v-model="tag.value">
+        </div>
+        <button @click="addTag">
+            New Tag
+        </button>
+        <button type="button" class="btn btn-primary btn-sm" v-on:click="addItem()">add</button>
+        <br>
+
+        <h1>Search</h1>
+        by Name : 
+        <input type="text" v-model="nameToSearch"> <button type="button" v-on:click="search">Search</button><br>
+        by Price : 
+        <input type="text" v-model="priceToSearch"> <button type="button" v-on:click="search">Search</button>
+    </div>
+
+</body>
+<script>
+    let token = localStorage.getItem('token')
+    if (!token) {
+        window.location = 'http://localhost:8080/signin.html'
+    }
+
+    new Vue({
+        el: "#app",
+        data: {
+            name: '',
+            price: 0,
+            stock: 0,
+            tags: [],
+            nameToSearch : '',
+            priceToSearch : 0,
+        },
+
+        methods: {
+            addTag: function () {
+                this.tags.push({ value: '' });
+            },
+            addItem() {
+                let token = localStorage.getItem('token')
+
+                axios.post(`http://localhost:3000/items/${token}`, {
+                    name: this.name,
+                    price: this.price,
+                    stock: this.stock,
+                    tags: this.tags
+                })
+                    .then((result) => {
+                        console.log(result);
+
+                    })
+                    .catch((err) => {
+                        console.log(err);
+
+                    });
+            },
+            search(){
+                let nameToSearch = this.nameToSearch
+                let priceToSearch = this.priceToSearch
+                if(nameToSearch){
+                    axios.get(`http://localhost:3000/name=${nameToSearch}`)
+                    .then((result) => {
+                        console.log(result);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        
+                    });
+                }else if(priceToSearch){
+                    axios.get(`http://localhost:3000/price_start=${priceToSearch}`)
+                    .then((result) => {
+                        console.log(result);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        
+                    });
+                }else{
+                    axios.get(`http://localhost:3000/`)
+                    .then((result) => {
+                        console.log(result);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                        
+                    });
+                }
+            }
+        }
+    })
+</script>
+
+</html>
